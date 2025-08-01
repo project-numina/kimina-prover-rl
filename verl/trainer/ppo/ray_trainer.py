@@ -719,6 +719,58 @@ class RayPPOTrainer:
             scores = reward_tensor.sum(-1).cpu().tolist()
             sample_scores.extend(scores)
 
+            # NUMINA: PERFORM A SECOND VALIDATION TURN IF SUPPORTED
+            if hasattr(self.val_dataset, "validation_generate_next_turn"):
+                second_turn_batch, idxs_to_update = self.val_dataset.validation_generate_next_turn(
+                    test_batch,
+                    output_texts,
+                    result["reward_extra_info"],
+                )
+
+                result["reward_extra_info"]["acc_turn_1"] = [acc for acc in result["reward_extra_info"]["acc"]]
+                result["reward_extra_info"]["acc_turn_2"] = [acc for acc in result["reward_extra_info"]["acc"]]
+
+                if second_turn_batch is not None:
+                    new_prompts_gen_batch = second_turn_batch.pop(
+                        batch_keys=batch_keys_to_pop,
+                        non_tensor_batch_keys=non_tensor_batch_keys_to_pop,
+                    )
+                    new_prompts_gen_batch.meta_info = {
+                        "eos_token_id": self.tokenizer.eos_token_id,
+                        "pad_token_id": self.tokenizer.pad_token_id,
+                        "recompute_log_prob": False,
+                        "do_sample": self.config.actor_rollout_ref.rollout.val_kwargs.do_sample,
+                        "validate": True,
+                        "global_steps": self.global_steps,
+                    }
+
+                    new_prompts_gen_batch_padded, pad_size = pad_dataproto_to_divisor(
+                        new_prompts_gen_batch, size_divisor
+                    )
+
+                    print(f"Generating multiturn ({len(idxs_to_update)}) responses")
+                    if not self.async_rollout_mode:
+                        output_new_prompts_gen_batch_padded = self.actor_rollout_wg.generate_sequences(
+                            new_prompts_gen_batch_padded
+                        )
+                    else:
+                        output_new_prompts_gen_batch_padded = self.async_rollout_manager.generate_sequences(
+                            new_prompts_gen_batch_padded
+                        )
+
+                    output_new_prompts_gen_batch = unpad_dataproto(
+                        output_new_prompts_gen_batch_padded, pad_size=pad_size
+                    )
+                    second_turn_batch = second_turn_batch.union(output_new_prompts_gen_batch)
+
+                    second_turn_batch.meta_info["validate"] = True
+                    second_turn_result = self.val_reward_fn(second_turn_batch, return_dict=True)
+
+                    for idx in range(len(second_turn_result["reward_extra_info"]["acc"])):
+                        result["reward_extra_info"]["acc_turn_2"][idxs_to_update[idx]] = second_turn_result[
+                            "reward_extra_info"
+                        ]["acc"][idx]
+
             reward_extra_infos_dict["reward"].extend(scores)
             print(f"len reward_extra_infos_dict['reward']: {len(reward_extra_infos_dict['reward'])}")
             if "reward_extra_info" in result:
