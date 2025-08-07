@@ -1,7 +1,7 @@
 name: Type Annotation and Docstring Coverage
 
 on:
-  pull_request:
+  workflow_dispatch: # Disabled for numina
     paths:
       - '**/*.py'
       - '.github/workflows/type-coverage-check.yml'

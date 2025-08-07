@@ -39,7 +39,7 @@ on:
   # and achieves higher coverage.
   push:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "verl/*.py"
@@ -54,7 +54,7 @@ on:
       - "recipe/dapo"
   pull_request:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"

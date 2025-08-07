@@ -31,8 +31,7 @@
 
 
 on:
-  pull_request:
-    types: [opened, edited, synchronize]
+  workflow_dispatch: # Disabled for numina
 
 jobs:
   check-title:

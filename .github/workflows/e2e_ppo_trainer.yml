@@ -7,7 +7,7 @@ on:
   # and achieves higher coverage.
   push:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"
@@ -20,7 +20,7 @@ on:
 
   pull_request:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"

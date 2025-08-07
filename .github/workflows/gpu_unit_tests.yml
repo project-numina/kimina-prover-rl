@@ -36,14 +36,14 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.4.x
     paths:
       - "**/*.py"
       - .github/workflows/gpu_unit_tests.yml
   pull_request:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.4.x
     paths:
       # The order that you define paths patterns matters:

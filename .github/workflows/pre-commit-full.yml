@@ -2,8 +2,8 @@ name: pre-commit-full
 
 # Run weekly on Sunday at 00:00 UTC
 on:
-  schedule:
-    - cron: "0 0 * * 0"
+  # schedule: # Disabled for numina
+  #   - cron: "0 0 * * 0" # Disabled for numina
   # Allow manual triggering
   workflow_dispatch:
 

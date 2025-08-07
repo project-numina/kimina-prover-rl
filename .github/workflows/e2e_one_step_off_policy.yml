@@ -39,7 +39,7 @@ on:
   # and achieves higher coverage.
   push:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"
@@ -54,7 +54,7 @@ on:
       - "recipe/one_step_off_policy"
   pull_request:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"

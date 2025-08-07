@@ -5,7 +5,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"
@@ -27,7 +27,7 @@ on:
       - "!examples"
   pull_request:
     branches:
-      - main
+      # - main # Disabled for numina
       - v0.*
     paths:
       - "**/*.py"

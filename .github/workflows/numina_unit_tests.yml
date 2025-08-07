@@ -1,0 +1,29 @@
+name: Numina Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install test dependencies
+        run: pip install -r recipe/kimina_prover_rl/requirements-test.txt
+
+      - name: Run tests
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$(pwd)/recipe/kimina_prover_rl
+          pytest recipe/kimina_prover_rl
